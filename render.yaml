@@ -3,7 +3,7 @@ services:
     name: lost-and-found-backend-GBC
     env: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn backend.wsgi:application"
+    startCommand: "gunicorn config.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
