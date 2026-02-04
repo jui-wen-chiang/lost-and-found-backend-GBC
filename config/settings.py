@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     "corsheaders",
     # Local apps
     "api",
+    # api documentation
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -147,6 +149,7 @@ CORS_ALLOWED_ORIGINS = [
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
+        'drf_spectacular.openapi.AutoSchema',
     ],
 }
 
