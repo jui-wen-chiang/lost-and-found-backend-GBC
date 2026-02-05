@@ -10,13 +10,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Initialize environ
 env = environ.Env(DEBUG=(bool, False))
 
-env_file = os.path.join(BASE_DIR, '.env.development')
-if os.path.exists(env_file):
-    environ.Env.read_env(env_file)
-    print(f"Loaded environment from {env_file}")
+# Check if it's a production environment (determine via environment variables)
+# Render automatically sets RENDER variables
+IS_PRODUCTION = os.environ.get('RENDER') is not None
+
+if IS_PRODUCTION:
+    print("Running in PRODUCTION mode, using system environment variables")
 else:
-    print("No .env file found, using system environment variables")
-    
+    env_file = os.path.join(BASE_DIR, '.env.development')
+    if os.path.exists(env_file):
+        environ.Env.read_env(env_file)
+        print(f"Loaded environment from {env_file}")
+    else:
+        print("No .env.development file found")
 
 # Use environmental variables
 SECRET_KEY = env("SECRET_KEY")
