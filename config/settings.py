@@ -10,17 +10,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Initialize environ
 env = environ.Env(DEBUG=(bool, False))
 
-# Based on the environment
-ENV_FILE = os.environ.get("DJANGO_ENV", "development")
-if ENV_FILE == "production":
-    env_file = os.path.join(BASE_DIR, ".env.production")
-else:
-    env_file = os.path.join(BASE_DIR, ".env.development")
-
-# Read .env file
+env_file = os.path.join(BASE_DIR, '.env.development')
 if os.path.exists(env_file):
     environ.Env.read_env(env_file)
     print(f"Loaded environment from {env_file}")
+else:
+    print("No .env file found, using system environment variables")
+    
 
 # Use environmental variables
 SECRET_KEY = env("SECRET_KEY")
