@@ -12,3 +12,4 @@ whitenoise
 dj-database-url
 drf-spectacular
 django-environ
+djangorestframework-simplejwt

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third party
+    "rest_framework_simplejwt.token_blacklist",  # Logout
     "rest_framework",
     "corsheaders",
     # Local apps
@@ -118,3 +119,41 @@ REST_FRAMEWORK = {
 }
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+"""
+Allowing projects to customize the User Model allows for dynamic retrieval of the User Model actually used by the current project, rather than hardcoding specific imports.
+"""
+AUTH_USER_MODEL = 'api.User'
+
+""" 
+API file details settings:
+
+Only add detailed explanations to complex API classes.
+@extend_schema(
+        summary="Generate custom reports",
+        description="This API is quite complex and requires detailed explanation...", 
+    )
+"""
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Lost and Found API',
+    'VERSION': '1.0.0',
+    # Automatically generated settings (no need to manually add @extend_schema)
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    # Automatically infer tags (based on URL path)
+    'TAGS': None,
+    
+    # Generate description from Serializer help_text
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+    ],
+    
+    'ENUM_NAME_OVERRIDES': {},
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+        'docExpansion': 'list',
+    },
+}
