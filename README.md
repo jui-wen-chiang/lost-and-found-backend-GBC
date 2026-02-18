@@ -11,7 +11,7 @@ This is the core engine of the Lost and Found Management System. It provides a r
     - Using `venv`: `python -m venv venv`
     - Or use Miniconda to create and activate the environment.
 4. Install dependencies:`pip install -r requirements.txt`
-5. Configure environment variables. Create and set up your `.env` and `.env.development` file.
+5. Configure environment variables. Create and set up your `.env.production` and `.env.development` file.
 6. Initialize the database (Currently no database tables).
 7. Start the development server: `python manage.py runserver`
 
