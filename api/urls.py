@@ -23,10 +23,10 @@ router = DefaultRouter()
 # Module APIs
 # ============================================
 # TODO: Development/Testing
-test_patterns = [
-    path("hello/", views.hello, name="hello"),
-    path("health/", views.health, name="health"),
-]
+# test_patterns = [
+#     path("hello/", views.hello, name="hello"),
+#     path("health/", views.health, name="health"),
+# ]
 
 auth_patterns = [
     path("register/", views.RegisterView.as_view(), name="register"),
@@ -63,5 +63,5 @@ urlpatterns = [
     path("reports/", include(report_patterns)),
     
     # Testing
-    path("test/", include(test_patterns)),
+    # path("test/", include(test_patterns)),
 ]

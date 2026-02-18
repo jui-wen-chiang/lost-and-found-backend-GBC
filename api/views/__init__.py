@@ -8,9 +8,9 @@ from .auth_views import (
     RegisterView,
     LoginView,
     LogoutView,
-    PasswordResetRequestView,
-    PasswordResetConfirmView,
-    UserProfileView,
+    # PasswordResetRequestView,
+    # PasswordResetConfirmView,
+    # UserProfileView,
 )
 
 # from .item_views import (

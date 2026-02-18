@@ -48,3 +48,54 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         
         return user
+
+class UserLoginSerializer(serializers.Serializer):
+    """User Login Serializer"""
+    
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+        
+        # Find users via email
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({
+                'email': 'No account found with this email'
+            })
+        
+        if not user.check_password(password):
+            raise serializers.ValidationError({
+                'password': 'Incorrect password'
+            })
+        
+        if not user.is_active:
+            raise serializers.ValidationError({
+                'email': 'This account has been disabled'
+            })
+        
+        data['user'] = user
+        return data
+
+
+class UserLogoutSerializer(serializers.Serializer):
+    """User Logout Serializer - 用於 JWT blacklist"""
+    
+    refresh = serializers.CharField()
+    
+    def validate(self, data):
+        from rest_framework_simplejwt.tokens import RefreshToken
+        from rest_framework_simplejwt.exceptions import TokenError
+        
+        try:
+            token = RefreshToken(data['refresh'])
+            token.blacklist()
+        except TokenError:
+            raise serializers.ValidationError({
+                'refresh': 'Token is invalid or already expired'
+            })
+        
+        return data
