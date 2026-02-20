@@ -8,50 +8,53 @@ import re
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, full_name, password=None, **extra_fields):
         if not email:
             raise ValueError("Email is required")
-
+        
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)  # Automatic encryption
+        user = self.model(email=email, full_name=full_name, **extra_fields)
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email, full_name, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("role", "admin")
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(email, full_name, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    # TODO: (Waiting for SQL table) Adjust fields
+
     ROLE_CHOICES = [
         ("student", "Student"),
         ("staff", "Staff"),
         ("admin", "Admin"),
     ]
 
-    # Field definitions
-    email = models.EmailField(unique=True, max_length=255)
-    username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="student")
-    student_id = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(unique=True, max_length=254)
+    full_name = models.CharField(max_length=255)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="student")
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    # is_superuser 由 PermissionsMixin 提供，不需重複定義
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(null=True, blank=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = ["full_name"]
 
     class Meta:
         db_table = "users"
         verbose_name = "User"
         verbose_name_plural = "Users"
+        indexes = [
+            models.Index(fields=["email"], name="idx_users_email"),
+            models.Index(fields=["role"], name="idx_users_role"),
+        ]
 
     def __str__(self):
         return self.email
@@ -82,14 +85,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return True, "Password is strong"
 
 
-class PasswordResetToken(models.Model):
-    # TODO: pending — confirm if this logic is needed
-    """Password reset Token"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=255, unique=True)
-    is_used = models.BooleanField(default=False)
-    expires_at = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
+# TODO: pending — confirm if this logic is needed
+# class PasswordResetToken(models.Model):
+#     """Password reset Token"""
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     token = models.CharField(max_length=255, unique=True)
+#     is_used = models.BooleanField(default=False)
+#     expires_at = models.DateTimeField()
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        db_table = "password_reset_tokens"
+#     class Meta:
+#         db_table = "password_reset_tokens"

@@ -12,8 +12,19 @@ This is the core engine of the Lost and Found Management System. It provides a r
     - Or use Miniconda to create and activate the environment.
 4. Install dependencies:`pip install -r requirements.txt`
 5. Configure environment variables. Create and set up your `.env.production` and `.env.development` file.
-6. Initialize the database (Currently no database tables).
-7. Start the development server: `python manage.py runserver`
+6. Initialize the local database and update your local database settings in the `.env.development` file. It should look like this: `Local DB = postgresql://[username]:[password]@localhost:5432/lost_and_found_management_system`.
+7. (Optional) After modifying the models, please generate and apply the migrations. 
+8. Start the development server: `python manage.py runserver`
+
+## DB Migration
+If necessary, you can delete all existing migration files (keeping only `__init__.py`) by running:
+`find . -path "*/migrations/*.py" -not -name "__init__.py" -delete`
+
+Run the following commands to generate new migration files and actually create the tables in the database:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
 ## API Documentation
 - Production (Render): [Swagger Docs](https://lost-and-found-backend-gbc.onrender.com/api/docs/)

@@ -26,7 +26,7 @@ from api.serializers.user_serializers import (
     # PasswordResetConfirmSerializer,
 )
 from api.permissions.rbac import IsStudent, IsStaff, IsAdmin
-from api.models.user import PasswordResetToken
+# from api.models.user import PasswordResetToken
 
 User = get_user_model()
 
