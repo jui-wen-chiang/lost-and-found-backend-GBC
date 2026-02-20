@@ -2,6 +2,7 @@
 Authentication Views
 Functions: Registration, Login, Logout, Password Reset, Personal Profile Management
 """
+from drf_spectacular.utils import extend_schema
 
 from rest_framework import status, generics
 from rest_framework.views import APIView
@@ -21,7 +22,6 @@ from api.serializers.user_serializers import (
     UserLoginSerializer,
     UserLoginSerializer,
     UserLogoutSerializer,
-    # UserProfileSerializer,
     # PasswordResetRequestSerializer,
     # PasswordResetConfirmSerializer,
 )
@@ -36,15 +36,6 @@ class RegisterView(generics.CreateAPIView):
     To create a new account, the password must meet security requirements (8+ characters, including uppercase and lowercase letters, numbers, and symbols).
     
     POST /api/auth/register/
-    {
-        "email": "student@university.edu",
-        "password": "SecurePass123!",
-        "password_confirm": "SecurePass123!",
-        "username": "john_doe",
-        "first_name": "John",
-        "last_name": "Doe",
-        "role": "student",
-    }
     """
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
@@ -64,7 +55,7 @@ class RegisterView(generics.CreateAPIView):
             'user': {
                 'id': user.id,
                 'email': user.email,
-                'username': user.username,
+                'full_name': user.full_name,
                 'role': user.role,
             },
             'tokens': {
@@ -90,7 +81,6 @@ class LoginView(TokenObtainPairView):
             "id": 1,
             "email": "student@university.edu",
             "role": "student",
-            "username": "john_doe"
         }
     }
     """
@@ -134,14 +124,12 @@ class LoginView(TokenObtainPairView):
             'user': {
                 'id': user.id,
                 'email': user.email,
-                'username': user.username,
+                'full_name': user.full_name,
                 'role': user.role,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
             }
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(request=None, responses={200: None})
 class LogoutView(APIView):
     """    
     POST /api/auth/logout/
@@ -173,7 +161,6 @@ class LogoutView(APIView):
 #         "email": "student@university.edu"
 #     }
     
-#     發送重設連結到用戶郵箱
 #     """
 #     permission_classes = [AllowAny]
 #     serializer_class = PasswordResetRequestSerializer

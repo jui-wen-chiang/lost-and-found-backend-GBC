@@ -15,8 +15,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'email', 'password', 'password_confirm',
-            'username', 'first_name', 'last_name',
-            'role', 'student_id'
+            'full_name', 
+            'role',
         ]
     
     def validate(self, data):
@@ -38,7 +38,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        validated_data.pop('password_confirm')
+        # validated_data.pop('password_confirm')
         password = validated_data.pop('password')
         
         # Use the create_user method of UserManager
