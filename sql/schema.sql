@@ -55,9 +55,11 @@ CREATE INDEX idx_items_category_location ON items (category_id, location_id);
 CREATE TABLE images (
     id SERIAL PRIMARY KEY,
     item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
-    image_url VARCHAR(500) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    original_filenameVARCHAR(500) NOT NULL,
     is_primary BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_images_item_id ON images (item_id);
