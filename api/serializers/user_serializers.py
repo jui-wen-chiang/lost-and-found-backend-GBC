@@ -8,13 +8,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     """ User Registration Serializer """
 
     password = serializers.CharField(write_only=True, min_length=8)
-    password_confirm = serializers.CharField(write_only=True)
+    # password_confirm = serializers.CharField(write_only=True)
     
     # TODO: (Waiting for SQL table) Adjust fields
     class Meta:
         model = User
         fields = [
-            'email', 'password', 'password_confirm',
+            'email', 'password',
             'full_name', 
             'role',
         ]
