@@ -1,11 +1,9 @@
 from .rbac import (
-    IsAdminUser,
     IsOwnerOrReadOnly,
-    IsAuthenticatedOrReadOnly,
+    RoleBasedPermission
 )
 
 __all__ = [
-    'IsAdminUser',
     'IsOwnerOrReadOnly', 
-    'IsAuthenticatedOrReadOnly',
+    'RoleBasedPermission'
 ]

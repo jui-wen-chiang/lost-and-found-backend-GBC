@@ -38,7 +38,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="student")
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    # is_superuser 由 PermissionsMixin 提供，不需重複定義
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(null=True, blank=True)
 
