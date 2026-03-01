@@ -1,7 +1,9 @@
 from .item_filters import ItemFilter
-from .report_utils import get_unclaimed_expired_items
+from .item_statistics import ItemStatisticsService
+from .report_utils import ReportUtils
 
 __all__ = [
     "ItemFilter",
-    "get_unclaimed_expired_items"
+    "ItemStatisticsService",
+    "ReportUtils"
 ]

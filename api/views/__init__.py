@@ -22,7 +22,7 @@ from .item_views import (
     # MyItemsView,
 )
 
-from .item_report_views import ItemReportView, UnclaimedItemReportView
+from .report_views import ItemReportView, UnclaimedItemReportView
 
 # from .claim_views import (
 #     ClaimViewSet,

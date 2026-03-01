@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views.auth_views import RegisterView, LoginView, LogoutView
 from .views.item_views import ItemListCreateView, ItemDetailView
-from .views.item_report_views import ItemReportView,UnclaimedItemReportView
+from .views.report_views import ItemReportView,UnclaimedItemReportView
 
 # from .views.claim_views import ClaimViewSet
 # from .views.admin_views import AuditViewSet, AdminDashboardView
