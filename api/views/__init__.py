@@ -22,6 +22,8 @@ from .item_views import (
     # MyItemsView,
 )
 
+from .item_report_views import ItemReportView
+
 # from .claim_views import (
 #     ClaimViewSet,
 #     AppointmentViewSet,
@@ -50,19 +52,18 @@ from .item_views import (
 
 __all__ = [
     # Auth
-    'RegisterView',
-    'LoginView',
-    'LogoutView',
-    'PasswordResetRequestView',
-    'PasswordResetConfirmView',
-    'UserProfileView',
-    
+    "RegisterView",
+    "LoginView",
+    "LogoutView",
+    "PasswordResetRequestView",
+    "PasswordResetConfirmView",
+    "UserProfileView",
     # # Items
-    # 'ItemViewSet',
-    # 'CategoryListView',
+    "ItemListCreateView",
+    "ItemDetailView",
     # 'LocationListView',
     # 'MyItemsView',
-    
+
     # # Claims
     # 'ClaimViewSet',
     # 'AppointmentViewSet',
@@ -72,13 +73,13 @@ __all__ = [
     # 'AuditQueueViewSet',
     # 'AdminDashboardView',
     # 'UserManagementViewSet',
-    
+
     # # Reports
+    "ItemReportView",
     # 'ItemStatisticsView',
     # 'UserStatisticsView',
     # 'UnclaimedItemReportView',
     # 'ExportReportView',
-    
     # # Coupons
     # 'CouponViewSet',
     # 'MyCouponsView',
