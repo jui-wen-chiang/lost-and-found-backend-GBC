@@ -13,12 +13,14 @@ from .auth_views import (
     # UserProfileView,
 )
 
-# from .item_views import (
-#     ItemViewSet,
-#     CategoryListView,
-#     LocationListView,
-#     MyItemsView,
-# )
+from .item_views import (
+    ItemListCreateView,
+    ItemDetailView,
+    # ItemViewSet,
+    # CategoryListView,
+    # LocationListView,
+    # MyItemsView,
+)
 
 # from .claim_views import (
 #     ClaimViewSet,

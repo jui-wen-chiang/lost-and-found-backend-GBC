@@ -17,17 +17,16 @@ from .user_serializers import (
     # UserListSerializer,
 )
 
-# # Week 5 & 6 - Item Serializers (Person E)
-# from .item_serializers import (
-#     ItemSerializer,
-#     ItemCreateSerializer,
-#     ItemUpdateSerializer,
-#     ItemDetailSerializer,
-#     ItemListSerializer,
-#     CategorySerializer,
-#     LocationSerializer,
-#     ItemImageSerializer,
-# )
+from .item_serializers import (
+    ItemSerializer,
+    # ItemCreateSerializer,
+    # ItemUpdateSerializer,
+    # ItemDetailSerializer,
+    # ItemListSerializer,
+    # CategorySerializer,
+    # LocationSerializer,
+    # ItemImageSerializer,
+)
 
 # # Week 6 & 7 - Claim Serializers (Person E)
 # from .claim_serializers import (
@@ -88,7 +87,7 @@ __all__ = [
     # 'UserListSerializer',
     
     # Items
-    # 'ItemSerializer',
+    'ItemSerializer',
     # 'ItemCreateSerializer',
     # 'ItemUpdateSerializer',
     # 'ItemDetailSerializer',

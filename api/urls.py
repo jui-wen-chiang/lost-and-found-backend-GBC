@@ -2,7 +2,8 @@ from django.urls import path
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views.auth_views import RegisterView, LoginView, LogoutView
-# from .views.item_views import ItemViewSet
+from .views.item_views import ItemListCreateView, ItemDetailView
+
 # from .views.claim_views import ClaimViewSet
 # from .views.admin_views import AuditViewSet, AdminDashboardView
 # from .views.coupon_views import CouponViewSet
@@ -50,17 +51,22 @@ report_patterns = [
     # path("export/", views.ExportReportView.as_view(), name="export_report"),
 ]
 
+items_patterns = [
+    path("items/", ItemListCreateView.as_view(), name="item-list-create"),
+    path("items/<int:pk>/", ItemDetailView.as_view(), name="item-detail"),
+]
+
 # ============================================
 # Main URL Patterns
 # ============================================
 urlpatterns = [
     # Router (RESTful CRUD)
     path("", include(router.urls)),
-    
     # Functional endpoints
     path("auth/", include(auth_patterns)),
     path("admin/", include(admin_patterns)),
     path("reports/", include(report_patterns)),
+    path("items/", include(items_patterns)),
     
     # Testing
     # path("test/", include(test_patterns)),
