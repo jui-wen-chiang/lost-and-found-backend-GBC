@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views.auth_views import RegisterView, LoginView, LogoutView
 from .views.item_views import ItemListCreateView, ItemDetailView
-from .views.item_report_views import ItemReportView
+from .views.item_report_views import ItemReportView,UnclaimedItemReportView
 
 # from .views.claim_views import ClaimViewSet
 # from .views.admin_views import AuditViewSet, AdminDashboardView
@@ -48,7 +48,7 @@ admin_patterns = [
 
 report_patterns = [
     path("items/", views.ItemReportView.as_view(), name="item_report"),
-    # path("users/", views.UserReportView.as_view(), name="user_report"),
+    path("unclaimed-item/", views.UnclaimedItemReportView.as_view(), name="unclaimed_item_report"),
     # path("export/", views.ExportReportView.as_view(), name="export_report"),
 ]
 

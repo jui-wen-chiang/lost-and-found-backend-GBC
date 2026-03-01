@@ -22,7 +22,7 @@ from .item_views import (
     # MyItemsView,
 )
 
-from .item_report_views import ItemReportView
+from .item_report_views import ItemReportView, UnclaimedItemReportView
 
 # from .claim_views import (
 #     ClaimViewSet,
@@ -76,6 +76,7 @@ __all__ = [
 
     # # Reports
     "ItemReportView",
+    "UnclaimedItemReportView",
     # 'ItemStatisticsView',
     # 'UserStatisticsView',
     # 'UnclaimedItemReportView',
