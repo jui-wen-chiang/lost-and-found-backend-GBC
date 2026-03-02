@@ -1,32 +1,169 @@
-from rest_framework import generics, permissions
+from django.db import transaction
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from api.models import Item
-from api.serializers import ItemSerializer
+from api.models import Item, Image
+from api.serializers import ItemSerializer, ImageSerializer
 from api.utils import ItemFilter
+from api.services import image_service
+
 
 class ItemListCreateView(generics.ListCreateAPIView):
-    queryset = Item.objects.all()
+    """
+    Create item + images: 
+        POST /api/items/ with FormData (fields: name, description, images[],...)
+    """
+    queryset = Item.objects.prefetch_related("images").all()
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     filter_backends = [DjangoFilterBackend]
     filterset_class = ItemFilter
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        files = request.FILES.getlist("images")  # multipart/form-data
+
+        with transaction.atomic():
+            item = serializer.save(owner=request.user)
+            if files:
+                image_service.process_images(item, files)
+
+        # Re-fetch to include images in response
+        item.refresh_from_db()
+        return Response(
+            ItemSerializer(item).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Item.objects.all()
+    queryset = Item.objects.prefetch_related("images").all()
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_update(self, serializer):
-        if self.request.user != self.get_object().owner:
-            raise permissions.PermissionDenied("Not your item")
-        serializer.save()
+    def _check_owner(self, item):
+        if self.request.user != item.owner:
+            raise permissions.PermissionDenied("Not your item.")
+
+    def update(self, request, *args, **kwargs):
+        item = self.get_object()
+        self._check_owner(item)
+
+        partial = kwargs.pop("partial", False)
+        serializer = self.get_serializer(item, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        files = request.FILES.getlist("images")
+
+        with transaction.atomic():
+            updated_item = serializer.save()
+            if files:
+                # Full replace strategy: delete old images, upload new ones
+                image_service.delete_images_by_item(updated_item)
+                image_service.process_images(updated_item, files)
+
+        updated_item.refresh_from_db()
+        return Response(ItemSerializer(updated_item).data)
 
     def perform_destroy(self, instance):
-        if self.request.user != instance.owner:
-            raise permissions.PermissionDenied("Not your item")
+        self._check_owner(instance)
+        # Image files are deleted here; DB cascade handles the records
+        image_service.delete_images_by_item(instance)
         instance.delete()
+
+
+class ImageListCreateView(APIView):
+    """
+    GET  /items/<item_id>/images/        → list images for an item
+    POST /items/<item_id>/images/        → add images to an existing item
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def _get_item(self, item_id, user):
+        try:
+            item = Item.objects.get(pk=item_id)
+        except Item.DoesNotExist:
+            return None, Response(
+                {"detail": "Item not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+        if item.owner != user:
+            return None, Response(
+                {"detail": "Not your item."}, status=status.HTTP_403_FORBIDDEN
+            )
+        return item, None
+
+    def get(self, request, item_id):
+        item, error = self._get_item(item_id, request.user)
+        if error:
+            return error
+        images = Image.objects.filter(item=item)
+        return Response(ImageSerializer(images, many=True).data)
+
+    def post(self, request, item_id):
+        item, error = self._get_item(item_id, request.user)
+        if error:
+            return error
+
+        files = request.FILES.getlist("images")
+        if not files:
+            return Response(
+                {"detail": "No images provided."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with transaction.atomic():
+            saved = image_service.process_images(item, files)
+
+        return Response(
+            ImageSerializer(saved, many=True).data, status=status.HTTP_201_CREATED
+        )
+
+
+class ImageDetailView(APIView):
+    """
+    PATCH  /items/<item_id>/images/<image_id>/   → set as primary
+    DELETE /items/<item_id>/images/<image_id>/   → delete single image
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def _get_image(self, item_id, image_id, user):
+        try:
+            image = Image.objects.select_related("item").get(
+                pk=image_id, item_id=item_id
+            )
+        except Image.DoesNotExist:
+            return None, Response(
+                {"detail": "Image not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+        if image.item.owner != user:
+            return None, Response(
+                {"detail": "Not your item."}, status=status.HTTP_403_FORBIDDEN
+            )
+        return image, None
+
+    def patch(self, request, item_id, image_id):
+        """Set this image as primary (clears others)."""
+        image, error = self._get_image(item_id, image_id, request.user)
+        if error:
+            return error
+
+        with transaction.atomic():
+            Image.objects.filter(item_id=item_id).update(is_primary=False)
+            image.is_primary = True
+            image.save(update_fields=["is_primary"])
+
+        return Response(ImageSerializer(image).data)
+
+    def delete(self, request, item_id, image_id):
+        image, error = self._get_image(item_id, image_id, request.user)
+        if error:
+            return error
+
+        image_service.delete_from_storage(image.file_path)
+        image.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
