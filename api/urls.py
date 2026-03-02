@@ -1,6 +1,14 @@
-from django.urls import path
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
+from .views import (
+    health,
+    CategoryListView,
+    LocationListView,
+    ItemListCreateView,
+    ItemDetailView,
+)
+
 from .views.auth_views import RegisterView, LoginView, LogoutView
 from .views.item_views import ItemListCreateView, ItemDetailView
 from .views.report_views import ItemReportView,UnclaimedItemReportView
@@ -13,23 +21,14 @@ from .views.report_views import ItemReportView,UnclaimedItemReportView
 from . import views
 
 # ============================================
-# ViewSets Router (CRUD APIs)
+# ViewSets Router (future CRUD APIs)
 # ============================================
 router = DefaultRouter()
 # router.register(r"items", ItemViewSet, basename="item")
-# router.register(r"claims", ClaimViewSet, basename="claim")
-# router.register(r"coupons", CouponViewSet, basename="coupon")
-# router.register(r"audit", AuditViewSet, basename="audit")
 
 # ============================================
-# Module APIs
+# Auth APIs
 # ============================================
-# TODO: Development/Testing
-# test_patterns = [
-#     path("hello/", views.hello, name="hello"),
-#     path("health/", views.health, name="health"),
-# ]
-
 auth_patterns = [
     path("register/", views.RegisterView.as_view(), name="register"),
     path("login/", views.LoginView.as_view(), name="login"),
@@ -61,14 +60,18 @@ items_patterns = [
 # Main URL Patterns
 # ============================================
 urlpatterns = [
-    # Router (RESTful CRUD)
+    # Router
     path("", include(router.urls)),
     # Functional endpoints
     path("auth/", include(auth_patterns)),
     path("admin/", include(admin_patterns)),
     path("reports/", include(report_patterns)),
-    path("items/", include(items_patterns)),
-    
+    # Health check
+    path("health/", health, name="health"),
+
+    # Categories & Locations
+    path("categories/", CategoryListView.as_view(), name="category-list"),
+    path("locations/", LocationListView.as_view(), name="location-list"),
     # Testing
     # path("test/", include(test_patterns)),
 ]
