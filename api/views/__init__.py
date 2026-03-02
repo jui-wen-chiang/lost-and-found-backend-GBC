@@ -24,6 +24,10 @@ from .item_views import (
 
 from .report_views import ItemReportView, UnclaimedItemReportView
 
+from .category_views import CategoryListView
+
+from .location_views import LocationListView
+
 # from .claim_views import (
 #     ClaimViewSet,
 #     AppointmentViewSet,
@@ -61,19 +65,18 @@ __all__ = [
     # # Items
     "ItemListCreateView",
     "ItemDetailView",
+    "LocationListView"
+    "CategoryListView"
     # 'LocationListView',
     # 'MyItemsView',
-
     # # Claims
     # 'ClaimViewSet',
     # 'AppointmentViewSet',
     # 'MyClaimsView',
-    
     # # Admin
     # 'AuditQueueViewSet',
     # 'AdminDashboardView',
     # 'UserManagementViewSet',
-
     # # Reports
     "ItemReportView",
     "UnclaimedItemReportView",
