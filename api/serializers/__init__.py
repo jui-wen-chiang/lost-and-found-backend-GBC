@@ -33,6 +33,11 @@ from .image_serializers import (
 )
 
 
+from .category_serializer import CategorySerializer
+
+from .location_serializer import LocationSerializer
+
+
 # # Week 6 & 7 - Claim Serializers (Person E)
 # from .claim_serializers import (
 #     ClaimSerializer,
@@ -100,6 +105,8 @@ __all__ = [
     # 'CategorySerializer',
     # 'LocationSerializer',
     # 'ItemImageSerializer',
+    "CategorySerializer",
+    "LocationSerializer",
     # Claims & Appointments
     # 'ClaimSerializer',
     # 'ClaimCreateSerializer',
