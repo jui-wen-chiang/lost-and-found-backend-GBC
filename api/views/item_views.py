@@ -1,29 +1,32 @@
+from django.http import JsonResponse
+from rest_framework.views import APIView
 from rest_framework import generics, permissions
-from .models import Item, Category, Location
-from .serializers import ItemSerializer, CategorySerializer, LocationSerializer
-
-# -------- Health Check --------
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-@api_view(["GET"])
+from django.db.models import Count
+from api.models import Item, Category, Location
+from api.serializers.item_serializers import (
+    ItemSerializer,
+    CategorySerializer,
+    LocationSerializer
+)
+# -------- Health --------
 def health(request):
-    return Response({"status": "healthy"})
+    return JsonResponse({"status": "ok"})
 
 
-# -------- Categories & Locations (Read-only) --------
-
+# -------- Categories --------
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
+# -------- Locations --------
 class LocationListView(generics.ListAPIView):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
 
-# -------- Item CRUD --------
+
 
 class ItemListCreateView(generics.ListCreateAPIView):
     queryset = Item.objects.all()
@@ -49,12 +52,7 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
             raise permissions.PermissionDenied("Not your item")
         instance.delete()
 
-        
 
-from rest_framework.views import APIView
-from django.db.models import Count
-
-# -------- Reports (FR-7) --------
 
 class LostItemsReportView(generics.ListAPIView):
     serializer_class = ItemSerializer
@@ -78,8 +76,5 @@ class ItemStatusStatsView(APIView):
             .annotate(count=Count("id"))
         )
 
-        result = {}
-        for s in stats:
-            result[s["status"]] = s["count"]
-
+        result = {s["status"]: s["count"] for s in stats}
         return Response(result)
