@@ -52,6 +52,8 @@ class RegisterView(generics.CreateAPIView):
 
         # Generate JWT token
         refresh = RefreshToken.for_user(user)
+        # Add user role to the token payload
+        refresh['role'] = user.role
 
         return Response(
             {
