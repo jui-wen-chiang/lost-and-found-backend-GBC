@@ -111,6 +111,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Django REST Framework (DRF) for Building a RESTful API
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
@@ -119,6 +122,14 @@ REST_FRAMEWORK = {
 }
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
 
 """
 Allowing projects to customize the User Model allows for dynamic retrieval of the User Model actually used by the current project, rather than hardcoding specific imports.
