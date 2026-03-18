@@ -21,6 +21,7 @@ class Coupon(models.Model):
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     expires_at = models.DateTimeField(null=True, blank=True)
     is_redeemed = models.BooleanField(default=False)
+    is_expired = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -36,3 +37,25 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+    
+class CouponUsage(models.Model):
+    coupon = models.ForeignKey(
+        "Coupon",
+        on_delete=models.CASCADE,
+        related_name="usages"
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    used_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "coupon_usage"
+
+    def __str__(self):
+        return f"Usage {self.id} - Coupon {self.coupon_id}"

@@ -9,7 +9,7 @@ from .item import Item
 from .image import Image
 from .claim import Claim
 from .appointment import Appointment
-from .coupon import Coupon
+from .coupon import Coupon , CouponUsage
 
 __all__ = [
     "User",

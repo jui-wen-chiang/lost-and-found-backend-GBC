@@ -26,6 +26,12 @@ AppointmentCreateView,
 AppointmentStatusUpdateView,
 AppointmentReminderView,
 )
+from api.views.coupon_views import (
+    UserCouponListView,
+    ActivateCouponView,
+    VerifyCouponView,
+    CouponStatsView,
+)
 
 urlpatterns = [
 
@@ -67,4 +73,11 @@ path("claims/<int:pk>/status/", ClaimStatusUpdateView.as_view(), name="claim-sta
 path("appointments/", AppointmentCreateView.as_view(), name="create-appointment"),
 path("appointments/<int:pk>/status/", AppointmentStatusUpdateView.as_view(), name="appointment-status"),
 path("appointments/reminders/", AppointmentReminderView.as_view(), name="appointment-reminders"),
+
+
+#----------Coupons-------------
+path("coupons/", UserCouponListView.as_view(), name="user-coupons"),
+path("coupons/activate/", ActivateCouponView.as_view(), name="activate-coupon"),
+path("coupons/verify/", VerifyCouponView.as_view(), name="verify-coupon"),
+path("coupons/stats/", CouponStatsView.as_view(), name="coupon-stats"),
 ]

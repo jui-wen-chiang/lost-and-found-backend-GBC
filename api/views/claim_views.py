@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 
 from api.models import Claim, Item
 from api.serializers.claim_serializers import ClaimSerializer, ClaimStatusUpdateSerializer
-
+from api.models import Coupon
+from api.utils.coupon_utils import generate_coupon_code
 
 class ClaimCreateView(generics.CreateAPIView):
     """
@@ -36,12 +37,21 @@ class ClaimListView(generics.ListAPIView):
 
 
 class ClaimStatusUpdateView(generics.UpdateAPIView):
-    """
-    Admin updates claim status
-    """
+
     queryset = Claim.objects.all()
     serializer_class = ClaimStatusUpdateSerializer
     permission_classes = [permissions.IsAdminUser]
+    def perform_update(self, serializer):
+        claim = serializer.save()
+
+        if claim.status == "completed":
+            if not Coupon.objects.filter(user=claim.claimant, claim=claim).exists():
+                Coupon.objects.create(
+                    user=claim.claimant,
+                    claim=claim,
+                    code=generate_coupon_code(),
+                    expires_at=timezone.now() + timedelta(days=7)
+                )
 
 
 from api.models import Appointment
