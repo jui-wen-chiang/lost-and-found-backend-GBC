@@ -32,6 +32,7 @@ DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 DATABASES = {"default": env.db("DATABASE_URL")}
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:5173")
 
 # Application definition
 INSTALLED_APPS = [

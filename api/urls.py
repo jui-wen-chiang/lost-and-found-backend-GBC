@@ -13,7 +13,9 @@ from .views import (
     UnclaimedItemReportView,
     ItemStatusSummaryView,
     TriggerExpirationView,
-    TaskResultView
+    TaskResultView,
+    QRCodeGenerateView,
+    QRCodeVerifyView,
 )
 
 
@@ -36,16 +38,19 @@ admin_patterns = [
 ]
 
 items_patterns = [
-    path("items/", ItemListCreateView.as_view(), name="item-list-create"),
-    path("items/<int:pk>/", ItemDetailView.as_view(), name="item-detail"),
+    path("", ItemListCreateView.as_view(), name="item-list-create"),
+    path("<int:pk>/", ItemDetailView.as_view(), name="item-detail"),
+    path(
+        "items/<int:item_id>/verify/", QRCodeVerifyView.as_view(), name="item-verify"
+    ),
 ]
 
 categories_patterns = [
-    path("categories/", CategoryListView.as_view(), name="category-list"),
+    path("", CategoryListView.as_view(), name="category-list"),
 ]
 
 locations_patterns = [
-    path("locations/", LocationListView.as_view(), name="location-list"),
+    path("", LocationListView.as_view(), name="location-list"),
 ]
 
 report_patterns = [
@@ -55,9 +60,21 @@ report_patterns = [
         UnclaimedItemReportView.as_view(),
         name="unclaimed_item_report",
     ),
-    path("status-summary/", ItemStatusSummaryView.as_view(), name="status_summary_report"),
-    path("trigger-expire/", TriggerExpirationView.as_view(), name="trigger_expire_report"),
-    path("automatic-update-expired-items /", TaskResultView.as_view(), name="automatic_update_expired_items_report"),
+    path(
+        "status-summary/", ItemStatusSummaryView.as_view(), name="status_summary_report"
+    ),
+    path(
+        "trigger-expire/", TriggerExpirationView.as_view(), name="trigger_expire_report"
+    ),
+    path(
+        "automatic-update-expired-items /",
+        TaskResultView.as_view(),
+        name="automatic_update_expired_items_report",
+    ),
+]
+
+qrCode_patterns = [
+    path("generate", QRCodeGenerateView.as_view(), name="qr-generate"),
 ]
 
 urlpatterns = [
@@ -69,4 +86,5 @@ urlpatterns = [
     path("categories/", include(categories_patterns)),
     path("locations/", include(locations_patterns)),
     path("reports/", include(report_patterns)),
+    path("qr/", include(qrCode_patterns)),
 ]

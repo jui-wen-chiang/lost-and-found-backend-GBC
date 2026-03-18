@@ -9,18 +9,18 @@ from .auth_views import (
 )
 from .item_views import (
     ItemListCreateView,
-    ItemDetailView,
-    # ItemViewSet,
-    # CategoryListView,
-    # LocationListView,
-    # MyItemsView,
+    ItemDetailView
 )
 from .report_views import (
     ItemReportView,
     UnclaimedItemReportView,
     ItemStatusSummaryView,
     TriggerExpirationView,
-    TaskResultView
+    TaskResultView,
+)
+from .item_qrcode_views import (
+    QRCodeGenerateView,
+    QRCodeVerifyView
 )
 from .category_views import CategoryListView
 from .location_views import LocationListView
@@ -43,5 +43,8 @@ __all__ = [
     "UnclaimedItemReportView",
     "ItemStatusSummaryView",
     "TriggerExpirationView",
-    "TaskResultView"
+    "TaskResultView",
+    # QRCode
+    "QRCodeGenerateView",
+    "QRCodeVerifyView",
 ]
