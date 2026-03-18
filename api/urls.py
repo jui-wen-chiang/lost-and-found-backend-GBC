@@ -11,6 +11,9 @@ from .views import (
     LocationListView,
     ItemReportView,
     UnclaimedItemReportView,
+    ItemStatusSummaryView,
+    TriggerExpirationView,
+    TaskResultView
 )
 
 
@@ -52,7 +55,9 @@ report_patterns = [
         UnclaimedItemReportView.as_view(),
         name="unclaimed_item_report",
     ),
-    # path("export/", views.ExportReportView.as_view(), name="export_report"),
+    path("status-summary/", ItemStatusSummaryView.as_view(), name="status_summary_report"),
+    path("trigger-expire/", TriggerExpirationView.as_view(), name="trigger_expire_report"),
+    path("automatic-update-expired-items /", TaskResultView.as_view(), name="automatic_update_expired_items_report"),
 ]
 
 urlpatterns = [

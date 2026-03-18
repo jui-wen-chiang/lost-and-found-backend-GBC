@@ -2,17 +2,11 @@
 Handling HTTP requests/responses
 All view categories are exported centrally for easy referencing in urls.py.
 """
-
-# Authentication & Items
 from .auth_views import (
     RegisterView,
     LoginView,
     LogoutView,
-    # PasswordResetRequestView,
-    # PasswordResetConfirmView,
-    # UserProfileView,
 )
-
 from .item_views import (
     ItemListCreateView,
     ItemDetailView,
@@ -21,38 +15,16 @@ from .item_views import (
     # LocationListView,
     # MyItemsView,
 )
-
-from .report_views import ItemReportView, UnclaimedItemReportView
-
+from .report_views import (
+    ItemReportView,
+    UnclaimedItemReportView,
+    ItemStatusSummaryView,
+    TriggerExpirationView,
+    TaskResultView
+)
 from .category_views import CategoryListView
-
 from .location_views import LocationListView
 
-# from .claim_views import (
-#     ClaimViewSet,
-#     AppointmentViewSet,
-#     MyClaimsView,
-# )
-
-# from .admin_views import (
-#     AuditQueueViewSet,
-#     AdminDashboardView,
-#     UserManagementViewSet,
-# )
-
-# from .report_views import (
-#     ItemStatisticsView,
-#     UserStatisticsView,
-#     UnclaimedItemReportView,
-#     ExportReportView,
-# )
-
-# from .coupon_views import (
-#     CouponViewSet,
-#     MyCouponsView,
-#     CouponActivateView,
-#     CouponVerifyView,
-# )
 
 __all__ = [
     # Auth
@@ -62,31 +34,14 @@ __all__ = [
     "PasswordResetRequestView",
     "PasswordResetConfirmView",
     "UserProfileView",
-    # # Items
+    # Items
     "ItemListCreateView",
     "ItemDetailView",
-    "LocationListView"
-    "CategoryListView"
-    # 'LocationListView',
-    # 'MyItemsView',
-    # # Claims
-    # 'ClaimViewSet',
-    # 'AppointmentViewSet',
-    # 'MyClaimsView',
-    # # Admin
-    # 'AuditQueueViewSet',
-    # 'AdminDashboardView',
-    # 'UserManagementViewSet',
-    # # Reports
+    "LocationListView" "CategoryListView"
+    # Reports
     "ItemReportView",
     "UnclaimedItemReportView",
-    # 'ItemStatisticsView',
-    # 'UserStatisticsView',
-    # 'UnclaimedItemReportView',
-    # 'ExportReportView',
-    # # Coupons
-    # 'CouponViewSet',
-    # 'MyCouponsView',
-    # 'CouponActivateView',
-    # 'CouponVerifyView',
+    "ItemStatusSummaryView",
+    "TriggerExpirationView",
+    "TaskResultView"
 ]

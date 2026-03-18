@@ -3,6 +3,7 @@ from pathlib import Path
 import environ
 import os
 from django.conf import settings
+from celery.schedules import crontab
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,6 +47,8 @@ INSTALLED_APPS = [
     "corsheaders",
     # Local apps
     "api",
+    "django_celery_beat",
+    "django_celery_results",
     # api documentation
     "drf_spectacular",
 ]
@@ -180,3 +183,15 @@ IMAGE_MAX_COUNT = 5
 IMAGE_MAX_DIMENSION = 1920
 IMAGE_ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 IMAGE_STORAGE_ROOT = os.path.join(MEDIA_ROOT, "items")
+
+# Celery
+CELERY_BROKER_URL = "django-db" 
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+CELERY_BEAT_SCHEDULE = {
+    "daily-auto-expire-items": {
+        "task": "api.tasks.scheduled_auto_expire",
+        "schedule": crontab(hour=0, minute=0),
+    },
+}
