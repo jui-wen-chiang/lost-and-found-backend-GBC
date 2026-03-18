@@ -2,6 +2,7 @@ from decouple import config
 from pathlib import Path
 import environ
 import os
+from django.conf import settings
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -168,3 +169,14 @@ SPECTACULAR_SETTINGS = {
         'docExpansion': 'list',
     },
 }
+
+"""
+Image Upload Settings
+"""
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+IMAGE_MAX_FILE_SIZE_MB = 1
+IMAGE_MAX_COUNT = 5
+IMAGE_MAX_DIMENSION = 1920
+IMAGE_ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
+IMAGE_STORAGE_ROOT = os.path.join(MEDIA_ROOT, "items")

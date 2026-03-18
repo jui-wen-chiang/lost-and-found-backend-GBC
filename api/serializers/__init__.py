@@ -28,6 +28,11 @@ from .item_serializers import (
     # ItemImageSerializer,
 )
 
+from .image_serializers import (
+    ImageSerializer,
+)
+
+
 from .category_serializer import CategorySerializer
 
 from .location_serializer import LocationSerializer
@@ -82,17 +87,17 @@ from .location_serializer import LocationSerializer
 
 __all__ = [
     # User & Auth
-    'UserRegistrationSerializer',
-    'UserLoginSerializer',
-    'UserLogoutSerializer',
+    "UserRegistrationSerializer",
+    "UserLoginSerializer",
+    "UserLogoutSerializer",
     # 'UserProfileSerializer',
     # 'PasswordResetRequestSerializer',
     # 'PasswordResetConfirmSerializer',
     # 'UserDetailSerializer',
     # 'UserListSerializer',
-    
     # Items
-    'ItemSerializer',
+    "ItemSerializer",
+    "ImageSerializer",
     # 'ItemCreateSerializer',
     # 'ItemUpdateSerializer',
     # 'ItemDetailSerializer',
@@ -110,13 +115,11 @@ __all__ = [
     # 'AppointmentSerializer',
     # 'AppointmentCreateSerializer',
     # 'AppointmentUpdateSerializer',
-    
     # Admin & Audit
     # 'AuditQueueSerializer',
     # 'AuditActionSerializer',
     # 'AdminItemEditSerializer',
     # 'UserManagementSerializer',
-    
     # Reports
     # 'ItemStatisticsSerializer',
     # 'UserStatisticsSerializer',
@@ -124,7 +127,6 @@ __all__ = [
     # 'DashboardStatsSerializer',
     # 'CategoryStatsSerializer',
     # 'LocationStatsSerializer',
-    
     # Coupons
     # 'CouponSerializer',
     # 'CouponCreateSerializer',
@@ -132,7 +134,6 @@ __all__ = [
     # 'CouponVerifySerializer',
     # 'CouponUsageSerializer',
     # 'MyCouponListSerializer',
-    
     # QR Code
     # 'QRCodeSerializer',
     # 'QRCodeGenerateSerializer',
