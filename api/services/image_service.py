@@ -3,22 +3,11 @@ import io
 import uuid
 import imghdr
 import struct
-# ---
-
 from PIL import Image as PilImage
 from django.conf import settings
 from django.core.exceptions import ValidationError
-
 from api.models import Image
 
-# ──────────────────────────────────────────
-# Settings (override in settings.py if needed)
-# ──────────────────────────────────────────
-MAX_FILE_SIZE_MB = getattr(settings, "IMAGE_MAX_FILE_SIZE_MB", 3)
-MAX_IMAGE_COUNT = getattr(settings, "IMAGE_MAX_COUNT", 1)
-MAX_DIMENSION = getattr(settings, "IMAGE_MAX_DIMENSION", 1920)
-ALLOWED_EXTENSIONS = getattr(settings, "IMAGE_ALLOWED_EXTENSIONS", {"jpg", "jpeg", "png", "webp"})
-STORAGE_ROOT = getattr(settings, "IMAGE_STORAGE_ROOT", os.path.join(settings.MEDIA_ROOT, "items"))
 
 # Magic bytes for supported formats
 MAGIC_BYTES = {

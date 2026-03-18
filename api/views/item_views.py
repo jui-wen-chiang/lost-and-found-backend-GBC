@@ -3,6 +3,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
+from rest_framework.parsers import MultiPartParser, FormParser
 from api.models import Item, Image
 from api.serializers import ItemSerializer, ImageSerializer
 from api.utils import ItemFilter
@@ -17,25 +19,35 @@ class ItemListCreateView(generics.ListCreateAPIView):
     queryset = Item.objects.prefetch_related("images").all()
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     filter_backends = [DjangoFilterBackend]
     filterset_class = ItemFilter
 
+    @extend_schema(
+        operation_id="create_item",
+        request={
+            "multipart/form-data": ItemSerializer
+        },
+    )        
     def create(self, request, *args, **kwargs):
+        """
+        Item Create Flow:
+        1. View initialize serializer and parse multipart request
+        2. Validate data via Serializer (triggers service-level image validation)
+        3. Persist item and process image attachments via Service layer
+        
+        Response: Return the newly created item with prefetched image records
+        """
         serializer = self.get_serializer(data=request.data)
+        # is_valid() triggers validate_upload_images
         serializer.is_valid(raise_exception=True)
 
-        files = request.FILES.getlist("images")  # multipart/form-data
+        # triggers Serializer.create
+        item = serializer.save(owner=request.user)
 
-        with transaction.atomic():
-            item = serializer.save(owner=request.user)
-            if files:
-                image_service.process_images(item, files)
-
-        # Re-fetch to include images in response
-        item.refresh_from_db()
         return Response(
-            ItemSerializer(item).data,
+            self.get_serializer(item).data,
             status=status.HTTP_201_CREATED,
         )
 
