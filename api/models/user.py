@@ -84,14 +84,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         return True, "Password is strong"
 
 
-# TODO: pending — confirm if this logic is needed
-# class PasswordResetToken(models.Model):
-#     """Password reset Token"""
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     token = models.CharField(max_length=255, unique=True)
-#     is_used = models.BooleanField(default=False)
-#     expires_at = models.DateTimeField()
-#     created_at = models.DateTimeField(auto_now_add=True)
+class PasswordResetToken(models.Model):
+    """Password reset Token"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True)
+    is_used = models.BooleanField(default=False)
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
-#     class Meta:
-#         db_table = "password_reset_tokens"
+    class Meta:
+        db_table = "password_reset_tokens"

@@ -2,33 +2,29 @@
 Authentication Views
 Functions: Registration, Login, Logout, Password Reset, Personal Profile Management
 """
-
 from drf_spectacular.utils import extend_schema
-
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.conf import settings
 
+from api.models.user import PasswordResetToken
 from api.serializers.user_serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
     UserLoginSerializer,
     UserLogoutSerializer,
-    # PasswordResetRequestSerializer,
-    # PasswordResetConfirmSerializer,
+    UserProfileSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
 )
-# from api.permissions.rbac import IsStudent, IsStaff, IsAdmin
-
-# from api.models.user import PasswordResetToken
 
 User = get_user_model()
 
@@ -137,127 +133,125 @@ class LogoutView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ============================================
-# Advanced Feature - required Serializer
-# ============================================
-# class PasswordResetRequestView(APIView):
-#     """
-#     Password reset request API (FR-2 Advanced)
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    """
+    User Profile API (Advanced Feature)
 
-#     POST /api/auth/password-reset/
-#     {
-#         "email": "student@university.edu"
-#     }
+    GET /api/auth/profile/
+    POST /api/auth/profile/  - update User Profile
+    """
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
 
-#     """
-#     permission_classes = [AllowAny]
-#     serializer_class = PasswordResetRequestSerializer
+    def get_object(self):
+        return self.request.user
 
-#     def post(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         serializer.is_valid(raise_exception=True)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
 
-#         email = serializer.validated_data['email']
-
-#         try:
-#             user = User.objects.get(email=email, is_active=True)
-
-#             reset_token = get_random_string(64)
-#             expires_at = timezone.now() + timezone.timedelta(hours=24)
-
-#             PasswordResetToken.objects.create(
-#                 user=user,
-#                 token=reset_token,
-#                 expires_at=expires_at
-#             )
-
-#             # TODO: pending — confirm if this logic is needed - send mail to reset password
-#             reset_link = f"{settings.FRONTEND_URL}/reset-password/{reset_token}"
-#             send_mail(
-#                 subject='Password Reset Request - Lost & Found System',
-#                 message=f'Click this link to reset your password: {reset_link}\nThis link expires in 24 hours.',
-#                 from_email=settings.DEFAULT_FROM_EMAIL,
-#                 recipient_list=[user.email],
-#                 fail_silently=False,
-#             )
-
-#             return Response({
-#                 'message': 'Password reset email sent. Please check your inbox.'
-#             }, status=status.HTTP_200_OK)
-
-#         except User.DoesNotExist:
-#             # Security considerations: Do not disclose whether the user exists
-#             return Response({
-#                 'message': 'If the email exists, a reset link has been sent.'
-#             }, status=status.HTTP_200_OK)
+        return Response({
+            'message': 'Profile updated successfully',
+            'user': serializer.data
+        })
 
 
-# class PasswordResetConfirmView(APIView):
-#     """
-#     Confirm Password Reset API (FR-2 Advanced)
+class PasswordResetRequestView(APIView):
+    """
+    Password reset request API (FR-2 Advanced)
 
-#     POST /api/auth/password-reset/confirm/
-#     {
-#         "token": "abc123...",
-#         "new_password": "NewSecurePass123!",
-#         "new_password_confirm": "NewSecurePass123!"
-#     }
-#     """
-#     permission_classes = [AllowAny]
-#     serializer_class = PasswordResetConfirmSerializer
+    POST /api/auth/password-reset/
+    {
+        "email": "student@university.edu"
+    }
 
-#     def post(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         serializer.is_valid(raise_exception=True)
+    """
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetRequestSerializer
 
-#         token = serializer.validated_data['token']
-#         new_password = serializer.validated_data['new_password']
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-#         try:
-#             reset_token = PasswordResetToken.objects.get(
-#                 token=token,
-#                 is_used=False,
-#                 expires_at__gt=timezone.now()
-#             )
+        email = serializer.validated_data['email']
 
-#             user = reset_token.user
-#             user.set_password(new_password)
-#             user.save()
+        try:
+            user = User.objects.get(email=email, is_active=True)
 
-#             reset_token.is_used = True
-#             reset_token.save()
+            reset_token = get_random_string(64)
+            expires_at = timezone.now() + timezone.timedelta(hours=24)
 
-#             return Response({
-#                 'message': 'Password has been reset successfully.'
-#             }, status=status.HTTP_200_OK)
+            PasswordResetToken.objects.create(
+                user=user,
+                token=reset_token,
+                expires_at=expires_at
+            )
 
-#         except PasswordResetToken.DoesNotExist:
-#             return Response({
-#                 'error': 'Invalid or expired token'
-#             }, status=status.HTTP_400_BAD_REQUEST)
+            reset_link = f"{settings.FRONTEND_URL}/reset-password/{reset_token}"
+            send_mail(
+                subject='Password Reset Request - Lost & Found System',
+                message=f'Click this link to reset your password: {reset_link}\nThis link expires in 24 hours.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+
+            return Response({
+                'message': 'Password reset email sent. Please check your inbox.'
+            }, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            # Security considerations: Do not disclose whether the user exists
+            return Response({
+                'message': 'If the email exists, a reset link has been sent.'
+            }, status=status.HTTP_200_OK)
 
 
-# class UserProfileView(generics.RetrieveUpdateAPIView):
-# """
-# User Profile API (Advanced Feature)
+class PasswordResetConfirmView(APIView):
+    """
+    Confirm Password Reset API (FR-2 Advanced)
 
-# GET /api/auth/profile/
-# POST /api/auth/profile/  - update User Profile
-# """
-# serializer_class = UserProfileSerializer
-# permission_classes = [IsAuthenticated]
+    POST /api/auth/password-reset/confirm/
+    {
+        "token": "abc123...",
+        "new_password": "NewSecurePass123!",
+        "new_password_confirm": "NewSecurePass123!"
+    }
+    """
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetConfirmSerializer
 
-# def get_object(self):
-#     return self.request.user
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-# def update(self, request, *args, **kwargs):
-#     partial = kwargs.pop('partial', False)
-#     instance = self.get_object()
-#     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-#     serializer.is_valid(raise_exception=True)
-#     self.perform_update(serializer)
+        token = serializer.validated_data['token']
+        new_password = serializer.validated_data['new_password']
 
-#     return Response({
-#         'message': 'Profile updated successfully',
-#         'user': serializer.data
-#     })
+        try:
+            reset_token = PasswordResetToken.objects.get(
+                token=token,
+                is_used=False,
+                expires_at__gt=timezone.now()
+            )
+
+            user = reset_token.user
+            user.set_password(new_password)
+            user.save()
+
+            reset_token.is_used = True
+            reset_token.save()
+
+            return Response({
+                'message': 'Password has been reset successfully.'
+            }, status=status.HTTP_200_OK)
+
+        except PasswordResetToken.DoesNotExist:
+            return Response({
+                'error': 'Invalid or expired token'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+

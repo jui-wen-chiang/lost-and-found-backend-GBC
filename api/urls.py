@@ -6,6 +6,9 @@ from .views import (
     RegisterView,
     LoginView,
     LogoutView,
+    UserProfileView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
     ItemListCreateView,
     ItemDetailView,
     LostItemsReportView,
@@ -44,16 +47,18 @@ auth_patterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    # path("password-reset/", views.PasswordResetRequestView.as_view(), name="password_reset"),
-    # path("password-reset/confirm/", views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
-    # path("profile/", views.UserProfileView.as_view(), name="user_profile"),
+    path("password-reset/", PasswordResetRequestView.as_view(), name="password_reset"),
+    path(
+        "password-reset/confirm/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
+    path("profile/", UserProfileView.as_view(), name="user_profile"),
 ]
 
 admin_patterns = [
     path("audit/posts/", AuditQueueView.as_view(), name="audit-queue"),
-    path(
-        "items/<int:pk>/approve/", ApprovePostView.as_view(), name="approve-post"
-    ),
+    path("items/<int:pk>/approve/", ApprovePostView.as_view(), name="approve-post"),
     path("items/<int:pk>/reject/", RejectPostView.as_view(), name="reject-post"),
     path(
         "items/<int:pk>/delete/",
@@ -129,6 +134,7 @@ coupons_patterns = [
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("auth/", include(auth_patterns)),
     path("admin/", include(admin_patterns)),
     path("items/", include(items_patterns)),
     path("categories/", include(categories_patterns)),
