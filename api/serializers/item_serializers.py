@@ -5,6 +5,7 @@ from drf_spectacular.types import OpenApiTypes
 from django.db import transaction
 from api.models import Item
 from api.services import image_service
+from api.models import Item, Category, Location
 
 class ItemSerializer(serializers.ModelSerializer):
     # GET images list
@@ -51,3 +52,14 @@ class ItemSerializer(serializers.ModelSerializer):
     @extend_schema_field(OpenApiTypes.BINARY)
     def get_upload_images(self, obj):
         return None
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'
