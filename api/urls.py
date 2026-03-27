@@ -50,17 +50,17 @@ auth_patterns = [
 ]
 
 admin_patterns = [
-    path("admin/audit/posts/", AuditQueueView.as_view(), name="audit-queue"),
+    path("audit/posts/", AuditQueueView.as_view(), name="audit-queue"),
     path(
-        "admin/items/<int:pk>/approve/", ApprovePostView.as_view(), name="approve-post"
+        "items/<int:pk>/approve/", ApprovePostView.as_view(), name="approve-post"
     ),
-    path("admin/items/<int:pk>/reject/", RejectPostView.as_view(), name="reject-post"),
+    path("items/<int:pk>/reject/", RejectPostView.as_view(), name="reject-post"),
     path(
-        "admin/items/<int:pk>/delete/",
+        "items/<int:pk>/delete/",
         AdminDeletePostView.as_view(),
         name="delete-post",
     ),
-    path("admin/items/<int:pk>/edit/", AdminEditPostView.as_view(), name="edit-post"),
+    path("items/<int:pk>/edit/", AdminEditPostView.as_view(), name="edit-post"),
 ]
 
 items_patterns = [
@@ -101,7 +101,7 @@ report_patterns = [
 ]
 
 qrCode_patterns = [
-    path("generate", QRCodeGenerateView.as_view(), name="qr-generate"),
+    path("generate/", QRCodeGenerateView.as_view(), name="qr-generate"),
 ]
 
 claims_patterns = [

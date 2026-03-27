@@ -63,8 +63,6 @@ class VerifyCouponView(APIView):
 
         return Response({"valid": True})
 
-from django.db.models import Count
-
 
 class CouponStatsView(APIView):
     permission_classes = [permissions.IsAdminUser]
