@@ -13,6 +13,8 @@ class Item(models.Model):
         ("approved", "Approved"),
         ("claimed", "Claimed"),
         ("completed", "Completed"),
+        ("rejected", "Rejected"),
+        ("expired", "Expired"),
     ]
 
     title = models.CharField(max_length=255)

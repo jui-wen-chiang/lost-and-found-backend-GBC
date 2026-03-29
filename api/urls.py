@@ -108,7 +108,7 @@ report_patterns = [
         "trigger-expire/", TriggerExpirationView.as_view(), name="trigger_expire_report"
     ),
     path(
-        "automatic-update-expired-items /",
+        "automatic-update-expired-items/",
         TaskResultView.as_view(),
         name="automatic_update_expired_items_report",
     ),

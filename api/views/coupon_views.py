@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
+from django.utils import timezone
 from api.models import Coupon
 from api.models import CouponUsage
 from api.permissions.rbac import IsAppAdmin
@@ -38,6 +39,9 @@ class ActivateCouponView(APIView):
         if coupon.is_redeemed:
             return Response({"error": "Already used"}, status=400)
 
+        if coupon.expires_at and coupon.expires_at < timezone.now():
+            return Response({"error": "Coupon has expired"}, status=400)
+
         coupon.is_redeemed = True
         coupon.save()
         
@@ -62,6 +66,9 @@ class VerifyCouponView(APIView):
         if coupon.is_redeemed:
             return Response({"valid": False, "reason": "Already used"})
 
+        if coupon.expires_at and coupon.expires_at < timezone.now():
+            return Response({"valid": False, "reason": "Expired"})
+
         return Response({"valid": True})
 
 
@@ -72,7 +79,7 @@ class CouponStatsView(APIView):
 
         total = Coupon.objects.count()
         used = Coupon.objects.filter(is_redeemed=True).count()
-        expired = Coupon.objects.filter(is_expired=True).count()
+        expired = Coupon.objects.filter(expires_at__lt=timezone.now(), is_redeemed=False).count()
 
         return Response({
             "total_coupons": total,

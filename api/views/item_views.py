@@ -96,6 +96,9 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance):
         self._check_owner(instance)
+        from api.models import Claim
+        if Claim.objects.filter(item=instance).exclude(status="rejected").exists():
+            raise permissions.PermissionDenied("Cannot delete an item that has active claims.")
         # Image files are deleted here; DB cascade handles the records
         image_service.delete_images_by_item(instance)
         instance.delete()

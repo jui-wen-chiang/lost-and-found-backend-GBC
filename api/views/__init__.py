@@ -16,7 +16,6 @@ from .item_views import (
     ItemListCreateView,
     ItemDetailView,
     LostItemsReportView,
-    LostItemsReportView,
     FoundItemsReportView,
     ItemStatusStatsView,
 )
@@ -100,8 +99,8 @@ __all__ = [
     "AppointmentStatusUpdateView",
     "AppointmentReminderView",
     # Coupon
-    UserCouponListView,
-    ActivateCouponView,
-    VerifyCouponView,
-    CouponStatsView,
+    "UserCouponListView",
+    "ActivateCouponView",
+    "VerifyCouponView",
+    "CouponStatsView",
 ]

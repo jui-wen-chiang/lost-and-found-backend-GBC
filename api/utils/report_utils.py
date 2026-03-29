@@ -7,6 +7,7 @@ from django.db.models import F, FloatField, ExpressionWrapper, DateTimeField
 from django.db.models.functions import Cast, Extract
 
 class ReportUtils:
+    @staticmethod
     def get_unclaimed_expired_items():
         now = timezone.now()
 

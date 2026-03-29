@@ -3,6 +3,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
+from django.db import transaction
 from datetime import timedelta
 
 from api.models import Claim, Coupon
@@ -41,23 +42,44 @@ class AppointmentCreateView(APIView):
 
         claim_id = request.data.get("claim")
         scheduled_at = request.data.get("scheduled_at")
+        location_id = request.data.get("location")
 
         try:
             claim = Claim.objects.get(id=claim_id)
         except Claim.DoesNotExist:
             return Response({"error": "Claim not found"}, status=404)
 
-        # check claim approved
+        # Only the claimant can schedule their own appointment
+        if claim.claimant != request.user:
+            return Response({"error": "You can only schedule appointments for your own claims."}, status=403)
+
+        # Claim must be approved
         if claim.status != "approved":
             return Response({"error": "Claim must be approved first"}, status=400)
 
-        # conflict detection
-        if Appointment.objects.filter(scheduled_at=scheduled_at).exists():
+        # Only one appointment per claim
+        if Appointment.objects.filter(claim=claim).exclude(status="cancelled").exists():
+            return Response({"error": "An appointment already exists for this claim."}, status=400)
+
+        # Appointment must be in the future
+        try:
+            scheduled_dt = timezone.datetime.fromisoformat(scheduled_at)
+            if timezone.is_naive(scheduled_dt):
+                scheduled_dt = timezone.make_aware(scheduled_dt)
+        except (TypeError, ValueError):
+            return Response({"error": "Invalid date format."}, status=400)
+
+        if scheduled_dt <= timezone.now():
+            return Response({"error": "Appointment must be scheduled in the future."}, status=400)
+
+        # Conflict detection
+        if Appointment.objects.filter(scheduled_at=scheduled_dt).exclude(status="cancelled").exists():
             return Response({"error": "Time slot already booked"}, status=400)
 
         appointment = Appointment.objects.create(
             claim=claim,
-            scheduled_at=scheduled_at
+            scheduled_at=scheduled_dt,
+            location_id=location_id if location_id else None,
         )
 
         return Response({
@@ -78,45 +100,50 @@ class AppointmentStatusUpdateView(APIView):
 
         status_value = request.data.get("status")
 
-        if status_value not in ["approved", "rejected", "completed"]:
-            return Response({"error": "Invalid status"}, status=400)
+        if status_value not in ["cancelled", "completed"]:
+            return Response({"error": "Invalid status. Must be 'cancelled' or 'completed'."}, status=400)
 
-        appointment.status = status_value
-        appointment.save()
+        with transaction.atomic():
+            appointment.status = status_value
+            appointment.save()
 
-        # When appointment is completed, also complete the claim, update item, and issue coupon
-        if status_value == "completed":
-            claim = appointment.claim
-            if claim and claim.status != "completed":
-                claim.status = "completed"
-                claim.save()
-                # Mark the item as completed (returned)
-                if claim.item and claim.item.status != "completed":
-                    claim.item.status = "completed"
-                    claim.item.save()
-                # Auto-issue coupon to the finder (item poster)
-                if not Coupon.objects.filter(claim=claim).exists():
-                    Coupon.objects.create(
-                        user=claim.item.owner if claim.item else claim.claimant,
-                        claim=claim,
-                        code=generate_coupon_code(),
-                        expires_at=timezone.now() + timedelta(days=7),
-                    )
+            # When appointment is completed, also complete the claim, update item, and issue coupon
+            if status_value == "completed":
+                claim = appointment.claim
+                if claim and claim.status != "completed":
+                    claim.status = "completed"
+                    claim.save()
+                    # Mark the item as completed (returned)
+                    if claim.item and claim.item.status != "completed":
+                        claim.item.status = "completed"
+                        claim.item.save()
+                    # Auto-issue coupon to the item owner (finder/poster)
+                    if not Coupon.objects.filter(claim=claim).exists():
+                        Coupon.objects.create(
+                            user=claim.item.owner if claim.item else claim.claimant,
+                            claim=claim,
+                            code=generate_coupon_code(),
+                            expires_at=timezone.now() + timedelta(days=7),
+                        )
 
         return Response({
             "message": "Appointment status updated",
             "status": appointment.status
         })
-    
+
+
 class AppointmentReminderView(APIView):
     permission_classes = [IsAppAdmin]
 
     def get(self, request):
 
-        upcoming = timezone.now() + timedelta(hours=24)
+        now = timezone.now()
+        upcoming = now + timedelta(hours=24)
 
         appointments = Appointment.objects.filter(
-            scheduled_at__lte=upcoming
+            scheduled_at__gte=now,
+            scheduled_at__lte=upcoming,
+            status="scheduled",
         )
 
         data = [

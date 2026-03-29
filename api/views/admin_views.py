@@ -24,6 +24,9 @@ class ApprovePostView(APIView):
         except Item.DoesNotExist:
             return Response({"error": "Item not found"}, status=404)
 
+        if item.status != "pending":
+            return Response({"error": f"Cannot approve item with status '{item.status}'. Only pending items can be approved."}, status=400)
+
         item.status = "approved"
         item.save()
 
@@ -39,6 +42,9 @@ class RejectPostView(APIView):
             item = Item.objects.get(pk=pk)
         except Item.DoesNotExist:
             return Response({"error": "Item not found"}, status=404)
+
+        if item.status not in ("pending", "approved"):
+            return Response({"error": f"Cannot reject item with status '{item.status}'."}, status=400)
 
         reason = request.data.get("reason", "")
 
