@@ -117,10 +117,15 @@ class AppointmentStatusUpdateView(APIView):
                     if claim.item and claim.item.status != "completed":
                         claim.item.status = "completed"
                         claim.item.save()
-                    # Auto-issue coupon to the item owner (finder/poster)
+                    # FOUND item: reward the finder (item.owner posted it)
+                    # LOST item: reward the returner (claimant found & returned it)
                     if not Coupon.objects.filter(claim=claim).exists():
+                        if claim.item:
+                            coupon_recipient = claim.item.owner if claim.item.item_type == "found" else claim.claimant
+                        else:
+                            coupon_recipient = claim.claimant
                         Coupon.objects.create(
-                            user=claim.item.owner if claim.item else claim.claimant,
+                            user=coupon_recipient,
                             claim=claim,
                             code=generate_coupon_code(),
                             expires_at=timezone.now() + timedelta(days=7),

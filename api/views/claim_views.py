@@ -91,7 +91,12 @@ class ClaimStatusUpdateView(generics.UpdateAPIView):
                 if claim.item and claim.item.status != "completed":
                     claim.item.status = "completed"
                     claim.item.save()
-                coupon_recipient = claim.item.owner if claim.item else claim.claimant
+                # FOUND item: reward the finder (item.owner posted it)
+                # LOST item: reward the returner (claimant found & returned it)
+                if claim.item:
+                    coupon_recipient = claim.item.owner if claim.item.item_type == "found" else claim.claimant
+                else:
+                    coupon_recipient = claim.claimant
                 if not Coupon.objects.filter(claim=claim).exists():
                     Coupon.objects.create(
                         user=coupon_recipient,
