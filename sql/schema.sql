@@ -100,6 +100,7 @@ CREATE TABLE coupons (
     discount_amount NUMERIC(10, 2) NOT NULL DEFAULT 0,
     expires_at TIMESTAMPTZ,
     is_redeemed BOOLEAN NOT NULL DEFAULT FALSE,
+    is_expired BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

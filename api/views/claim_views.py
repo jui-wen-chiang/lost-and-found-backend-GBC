@@ -56,6 +56,11 @@ class ClaimStatusUpdateView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         claim = serializer.save()
 
+        if claim.status == "approved":
+            if claim.item and claim.item.status != "claimed":
+                claim.item.status = "claimed"
+                claim.item.save()
+
         if claim.status == "completed":
             if not Coupon.objects.filter(user=claim.claimant, claim=claim).exists():
                 Coupon.objects.create(

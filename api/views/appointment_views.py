@@ -4,12 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
 from datetime import timedelta
-from django.utils import timezone
-from datetime import timedelta
 
-from api.models import Claim
+from api.models import Claim, Coupon
 from api.models import Appointment
 from api.permissions.rbac import IsAppAdmin
+from api.utils.coupon_utils import generate_coupon_code
 
 
 class AppointmentCreateView(APIView):
@@ -84,6 +83,25 @@ class AppointmentStatusUpdateView(APIView):
 
         appointment.status = status_value
         appointment.save()
+
+        # When appointment is completed, also complete the claim, update item, and issue coupon
+        if status_value == "completed":
+            claim = appointment.claim
+            if claim and claim.status != "completed":
+                claim.status = "completed"
+                claim.save()
+                # Mark the item as completed (returned)
+                if claim.item and claim.item.status != "completed":
+                    claim.item.status = "completed"
+                    claim.item.save()
+                # Auto-issue coupon to the finder (item poster)
+                if not Coupon.objects.filter(claim=claim).exists():
+                    Coupon.objects.create(
+                        user=claim.item.owner if claim.item else claim.claimant,
+                        claim=claim,
+                        code=generate_coupon_code(),
+                        expires_at=timezone.now() + timedelta(days=7),
+                    )
 
         return Response({
             "message": "Appointment status updated",
