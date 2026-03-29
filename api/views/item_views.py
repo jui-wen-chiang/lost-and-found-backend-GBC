@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.db.models import Count
 from rest_framework import generics, permissions, status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -61,8 +62,9 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def _check_owner(self, item):
-        if self.request.user != item.owner:
-            raise permissions.PermissionDenied("Not your item.")
+        user = self.request.user
+        if user != item.owner and not (user.is_staff or getattr(user, 'role', '') == 'admin'):
+            raise PermissionDenied("Not your item.")
 
     def update(self, request, *args, **kwargs):
         item = self.get_object()
@@ -98,7 +100,7 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
         self._check_owner(instance)
         from api.models import Claim
         if Claim.objects.filter(item=instance).exclude(status="rejected").exists():
-            raise permissions.PermissionDenied("Cannot delete an item that has active claims.")
+            raise PermissionDenied("Cannot delete an item that has active claims.")
         # Image files are deleted here; DB cascade handles the records
         image_service.delete_images_by_item(instance)
         instance.delete()
