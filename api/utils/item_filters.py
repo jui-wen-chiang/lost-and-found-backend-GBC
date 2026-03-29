@@ -3,7 +3,7 @@ from django.db.models import Q
 from api.models import Item
 
 class ItemFilter(django_filters.FilterSet):
-    item_type = django_filters.NumberFilter(field_name='item_type')
+    item_type = django_filters.CharFilter(field_name='item_type')
     category = django_filters.NumberFilter(field_name='category__id')
     location = django_filters.NumberFilter(field_name='location__id')
     lost_at_after = django_filters.DateFilter(field_name='lost_at', lookup_expr='gte')

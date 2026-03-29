@@ -23,6 +23,7 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = [
             "id", "title", "description", "item_type", "status",
             "lost_at", "found_at", "category", "location",
+            "owner", "created_at", "updated_at",
             "images", "upload_images",
         ]
         read_only_fields = ["id", "owner", "created_at", "updated_at"]
@@ -47,6 +48,11 @@ class ItemSerializer(serializers.ModelSerializer):
                 image_service.process_images(item, upload_images)
                 
         return item
+
+    def update(self, instance, validated_data):
+        # Remove upload_images so default update doesn't try to set it on the model
+        validated_data.pop('upload_images', None)
+        return super().update(instance, validated_data)
 
     # Swagger display fix
     @extend_schema_field(OpenApiTypes.BINARY)

@@ -58,6 +58,7 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.prefetch_related("images").all()
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def _check_owner(self, item):
         if self.request.user != item.owner:
@@ -71,13 +72,23 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(item, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
-        files = request.FILES.getlist("images")
+        files = request.FILES.getlist("upload_images")
+        keep_ids = request.data.getlist("existing_image_ids")
+        keep_ids = [int(i) for i in keep_ids if str(i).isdigit()]
 
         with transaction.atomic():
             updated_item = serializer.save()
+
+            # Delete images that the user removed in the UI
+            if keep_ids is not None or files:
+                existing_images = Image.objects.filter(item=updated_item)
+                to_delete = existing_images.exclude(id__in=keep_ids)
+                for img in to_delete:
+                    image_service.delete_from_storage(img.file_path)
+                to_delete.delete()
+
+            # Upload any new images
             if files:
-                # Full replace strategy: delete old images, upload new ones
-                image_service.delete_images_by_item(updated_item)
                 image_service.process_images(updated_item, files)
 
         updated_item.refresh_from_db()

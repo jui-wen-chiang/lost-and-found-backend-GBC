@@ -9,10 +9,34 @@ from datetime import timedelta
 
 from api.models import Claim
 from api.models import Appointment
+from api.permissions.rbac import IsAppAdmin
 
 
 class AppointmentCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        """List appointments — admins see all, regular users see their own."""
+        if getattr(request.user, "role", None) == "admin":
+            appointments = Appointment.objects.all().order_by("-scheduled_at")
+        else:
+            appointments = Appointment.objects.filter(
+                claim__claimant=request.user
+            ).order_by("-scheduled_at")
+
+        data = [
+            {
+                "id": a.id,
+                "claim": a.claim_id,
+                "location": a.location_id,
+                "scheduled_at": a.scheduled_at.isoformat() if a.scheduled_at else None,
+                "status": a.status,
+                "created_at": a.created_at.isoformat() if a.created_at else None,
+                "updated_at": a.updated_at.isoformat() if a.updated_at else None,
+            }
+            for a in appointments
+        ]
+        return Response(data)
 
     def post(self, request):
 
@@ -45,7 +69,7 @@ class AppointmentCreateView(APIView):
 
 
 class AppointmentStatusUpdateView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAppAdmin]
 
     def patch(self, request, pk):
         try:
@@ -67,7 +91,7 @@ class AppointmentStatusUpdateView(APIView):
         })
     
 class AppointmentReminderView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAppAdmin]
 
     def get(self, request):
 

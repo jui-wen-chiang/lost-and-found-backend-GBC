@@ -1,6 +1,21 @@
 from rest_framework import permissions
 from rest_framework.permissions import BasePermission, IsAuthenticatedOrReadOnly
 
+
+class IsAppAdmin(permissions.BasePermission):
+    """
+    Allow access only to users whose role is 'admin'.
+    Unlike IsAdminUser, this checks the app-level role field
+    instead of Django's is_staff flag.
+    """
+    def has_permission(self, request, view):
+        return (
+            request.user
+            and request.user.is_authenticated
+            and getattr(request.user, "role", None) == "admin"
+        )
+
+
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
     The owner of the item can edit it, while others can only read it.

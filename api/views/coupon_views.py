@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from api.models import Coupon
 from api.models import CouponUsage
+from api.permissions.rbac import IsAppAdmin
 
 
 class UserCouponListView(APIView):
@@ -48,7 +49,7 @@ class ActivateCouponView(APIView):
     
 
 class VerifyCouponView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAppAdmin]
 
     def post(self, request):
         code = request.data.get("code")
@@ -65,7 +66,7 @@ class VerifyCouponView(APIView):
 
 
 class CouponStatsView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAppAdmin]
 
     def get(self, request):
 

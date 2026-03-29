@@ -20,6 +20,9 @@ from .views import (
     RejectPostView,
     AdminDeletePostView,
     AdminEditPostView,
+    AdminUserListView,
+    AdminUserRoleUpdateView,
+    VerifiedItemsListView,
     CategoryListView,
     LocationListView,
     ItemReportView,
@@ -32,6 +35,7 @@ from .views import (
     ClaimCreateView,
     ClaimListView,
     ClaimStatusUpdateView,
+    AdminClaimListView,
     AppointmentCreateView,
     AppointmentStatusUpdateView,
     AppointmentReminderView,
@@ -68,6 +72,9 @@ admin_patterns = [
         name="delete-post",
     ),
     path("items/<int:pk>/edit/", AdminEditPostView.as_view(), name="edit-post"),
+    path("users/", AdminUserListView.as_view(), name="admin-users"),
+    path("users/<int:pk>/role/", AdminUserRoleUpdateView.as_view(), name="admin-user-role"),
+    path("items/verified/", VerifiedItemsListView.as_view(), name="verified-items"),
 ]
 
 items_patterns = [
@@ -114,6 +121,7 @@ qrCode_patterns = [
 claims_patterns = [
     path("", ClaimCreateView.as_view(), name="claim-create"),
     path("my/", ClaimListView.as_view(), name="my-claims"),
+    path("all/", AdminClaimListView.as_view(), name="all-claims"),
     path("<int:pk>/status/", ClaimStatusUpdateView.as_view(), name="claim-status"),
 ]
 

@@ -7,6 +7,7 @@ from api.utils.coupon_utils import generate_coupon_code
 from api.models import Claim
 from api.serializers.claim_serializers import ClaimSerializer, ClaimStatusUpdateSerializer
 from api.models import Coupon
+from api.permissions.rbac import IsAppAdmin
 
 class ClaimCreateView(generics.CreateAPIView):
     """
@@ -36,11 +37,22 @@ class ClaimListView(generics.ListAPIView):
         return Claim.objects.filter(claimant=self.request.user)
 
 
+class AdminClaimListView(generics.ListAPIView):
+    """
+    Admin: view all claims
+    """
+    serializer_class = ClaimSerializer
+    permission_classes = [IsAppAdmin]
+
+    def get_queryset(self):
+        return Claim.objects.all().order_by("-created_at")
+
+
 class ClaimStatusUpdateView(generics.UpdateAPIView):
 
     queryset = Claim.objects.all()
     serializer_class = ClaimStatusUpdateSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAppAdmin]
     def perform_update(self, serializer):
         claim = serializer.save()
 

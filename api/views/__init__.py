@@ -26,6 +26,9 @@ from .admin_views import (
     RejectPostView,
     AdminDeletePostView,
     AdminEditPostView,
+    AdminUserListView,
+    AdminUserRoleUpdateView,
+    VerifiedItemsListView,
 )
 from .report_views import (
     ItemReportView,
@@ -38,7 +41,7 @@ from .item_qrcode_views import QRCodeGenerateView, QRCodeVerifyView
 from .category_views import CategoryListView
 from .location_views import LocationListView
 
-from .claim_views import ClaimCreateView, ClaimListView, ClaimStatusUpdateView
+from .claim_views import ClaimCreateView, ClaimListView, ClaimStatusUpdateView, AdminClaimListView
 from .appointment_views import (
     AppointmentCreateView,
     AppointmentStatusUpdateView,
@@ -66,6 +69,9 @@ __all__ = [
     "RejectPostView",
     "AdminDeletePostView",
     "AdminEditPostView",
+    "AdminUserListView",
+    "AdminUserRoleUpdateView",
+    "VerifiedItemsListView",
     # Items
     "ItemListCreateView",
     "ItemDetailView",
@@ -88,6 +94,7 @@ __all__ = [
     "ClaimCreateView",
     "ClaimListView",
     "ClaimStatusUpdateView",
+    "AdminClaimListView",
     # Appointment
     "AppointmentCreateView",
     "AppointmentStatusUpdateView",

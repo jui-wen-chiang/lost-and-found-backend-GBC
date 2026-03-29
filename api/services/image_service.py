@@ -9,6 +9,11 @@ from django.core.exceptions import ValidationError
 from api.models import Image
 
 
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
+MAX_FILE_SIZE_MB = 5
+MAX_IMAGE_COUNT = 5
+STORAGE_ROOT = os.path.join(settings.MEDIA_ROOT, "items")
+
 # Magic bytes for supported formats
 MAGIC_BYTES = {
     b"\xff\xd8\xff": "jpeg",
@@ -108,8 +113,10 @@ def upload_to_storage(item_id, file):
     filename = f"{uuid.uuid4().hex}{ext}"
     abs_path = os.path.join(folder, filename)
 
+    file.seek(0)
     with open(abs_path, "wb") as f:
-        f.write(file.read())
+        for chunk in file.chunks() if hasattr(file, 'chunks') else [file.read()]:
+            f.write(chunk)
     
     # Store relative path for portability
     rel_path = os.path.relpath(abs_path, settings.MEDIA_ROOT)
@@ -167,8 +174,7 @@ def process_images(item, files):
 
     saved_images = []
     for index, file in enumerate(files):
-        validate_image(file)
-        # optimized = optimize_image(file)
+        file.seek(0)
         file_path = upload_to_storage(item.id, file)
         is_primary = (index == 0)
         record = save_image_record(item, file_path, file.name, is_primary=is_primary)
