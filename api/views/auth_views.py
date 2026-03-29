@@ -15,7 +15,10 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.conf import settings
 
+from django.db.models import Count, Q
+
 from api.models.user import PasswordResetToken
+from api.models import Item, Claim
 from api.serializers.user_serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
@@ -253,5 +256,46 @@ class PasswordResetConfirmView(APIView):
             return Response({
                 'error': 'Invalid or expired token'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserDashboardView(APIView):
+    """
+    Personal dashboard summary for the authenticated user.
+
+    GET /api/auth/dashboard/
+    Returns item counts by status/type and claim counts.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        item_stats = (
+            Item.objects.filter(owner=user)
+            .aggregate(
+                total=Count("id"),
+                pending=Count("id", filter=Q(status="pending")),
+                approved=Count("id", filter=Q(status="approved")),
+                claimed=Count("id", filter=Q(status="claimed")),
+                completed=Count("id", filter=Q(status="completed")),
+                lost=Count("id", filter=Q(item_type="lost")),
+                found=Count("id", filter=Q(item_type="found")),
+            )
+        )
+
+        claim_stats = (
+            Claim.objects.filter(claimant=user)
+            .aggregate(
+                total=Count("id"),
+                pending=Count("id", filter=Q(status="pending")),
+                approved=Count("id", filter=Q(status="approved")),
+                completed=Count("id", filter=Q(status="completed")),
+            )
+        )
+
+        return Response({
+            "items": item_stats,
+            "claims": claim_stats,
+        })
 
 

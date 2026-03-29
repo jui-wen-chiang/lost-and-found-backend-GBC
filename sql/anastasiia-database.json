@@ -7164,9 +7164,9 @@
   "model": "api.location",
   "pk": 1,
   "fields": {
-    "name": "",
-    "campus": "GBC - Casa Loma Campus",
-    "building": "Main Building",
+    "name": "Casa Loma",
+    "campus": "Casa Loma",
+    "building": "",
     "is_active": true,
     "created_at": "2026-03-14T18:52:02.031Z",
     "updated_at": "2026-03-14T18:52:02.031Z"
@@ -7174,23 +7174,11 @@
 },
 {
   "model": "api.location",
-  "pk": 3,
-  "fields": {
-    "name": "Library - Casa Loma",
-    "campus": "GBC - Casa Loma Campus",
-    "building": "Main Building",
-    "is_active": true,
-    "created_at": "2026-03-14T18:52:26.167Z",
-    "updated_at": "2026-03-14T18:52:26.167Z"
-  }
-},
-{
-  "model": "api.location",
   "pk": 4,
   "fields": {
-    "name": "Cafeteria - St. James",
-    "campus": "GBC - St. James Campus",
-    "building": "Building A",
+    "name": "St. James",
+    "campus": "St. James",
+    "building": "",
     "is_active": true,
     "created_at": "2026-03-14T18:52:26.169Z",
     "updated_at": "2026-03-14T18:52:26.169Z"
@@ -7200,50 +7188,15 @@
   "model": "api.location",
   "pk": 5,
   "fields": {
-    "name": "Student Centre - Waterfront",
-    "campus": "GBC - Waterfront Campus",
-    "building": "Main Building",
+    "name": "Waterfront",
+    "campus": "Waterfront",
+    "building": "",
     "is_active": true,
     "created_at": "2026-03-14T18:52:26.170Z",
     "updated_at": "2026-03-14T18:52:26.170Z"
   }
 },
 {
-  "model": "api.location",
-  "pk": 6,
-  "fields": {
-    "name": "Gym - Daniels Laing",
-    "campus": "GBC - Daniels Laing Campus",
-    "building": "Main Building",
-    "is_active": true,
-    "created_at": "2026-03-14T18:52:26.170Z",
-    "updated_at": "2026-03-14T18:52:26.170Z"
-  }
-},
-{
-  "model": "api.location",
-  "pk": 7,
-  "fields": {
-    "name": "Room 200 - Casa Loma",
-    "campus": "GBC - Casa Loma Campus",
-    "building": "Main Building",
-    "is_active": true,
-    "created_at": "2026-03-14T18:52:26.171Z",
-    "updated_at": "2026-03-14T18:52:26.171Z"
-  }
-},
-{
-  "model": "api.location",
-  "pk": 8,
-  "fields": {
-    "name": "Parking Lot B - St. James",
-    "campus": "GBC - St. James Campus",
-    "building": "Building B",
-    "is_active": true,
-    "created_at": "2026-03-14T18:52:26.172Z",
-    "updated_at": "2026-03-14T18:52:26.172Z"
-  }
-},
 {
   "model": "api.item",
   "pk": 2,
@@ -7253,7 +7206,7 @@
     "item_type": "lost",
     "status": "pending",
     "category": 5,
-    "location": 3,
+    "location": 1,
     "owner": 1,
     "lost_at": "2025-06-15T00:00:00Z",
     "found_at": null,

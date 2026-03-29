@@ -8,6 +8,7 @@ from .auth_views import (
     LoginView,
     LogoutView,
     UserProfileView,
+    UserDashboardView,
     PasswordResetRequestView,
     PasswordResetConfirmView
 )

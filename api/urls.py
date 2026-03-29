@@ -7,6 +7,7 @@ from .views import (
     LoginView,
     LogoutView,
     UserProfileView,
+    UserDashboardView,
     PasswordResetRequestView,
     PasswordResetConfirmView,
     ItemListCreateView,
@@ -54,6 +55,7 @@ auth_patterns = [
         name="password_reset_confirm",
     ),
     path("profile/", UserProfileView.as_view(), name="user_profile"),
+    path("dashboard/", UserDashboardView.as_view(), name="user_dashboard"),
 ]
 
 admin_patterns = [
