@@ -47,9 +47,6 @@ If you've made changes to the data and want to share the updated version:
 python manage.py dumpdata --indent 2 -o sql/anastasiia-database.json
 ```
 
-? testing password
-
-
 ## API Documentation
 - Production (Render): [Swagger Docs](https://lost-and-found-backend-gbc.onrender.com/api/docs/)
 - Local Development URL: [http://127.0.0.1:8000/api/docs/](http://127.0.0.1:8000/api/docs/)
