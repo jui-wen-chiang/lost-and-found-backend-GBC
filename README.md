@@ -17,14 +17,38 @@ This is the core engine of the Lost and Found Management System. It provides a r
 8. Start the development server: `python manage.py runserver`
 
 ## DB Migration
-If necessary, you can delete all existing migration files (keeping only `__init__.py`) by running:
-`find . -path "*/migrations/*.py" -not -name "__init__.py" -delete`
+If necessary, you can delete all existing migration files (keeping only __init__.py) by running:
+```bash
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+```
 
 Run the following commands to generate new migration files and actually create the tables in the database:
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
+
+##  Load Demo Data
+- `sql/anastasiia-database.json` — Full Django fixture (all apps: api, auth, contenttypes, token_blacklist)
+- `sql/schema.sql` — Database schema reference
+
+### How to Load
+```bash
+# After PostgreSQL is running and migrations are applied
+python manage.py migrate
+
+# Load the demo data
+python manage.py loaddata sql/anastasiia-database.json
+```
+
+### How to Re-generate
+If you've made changes to the data and want to share the updated version:
+```bash
+python manage.py dumpdata --indent 2 -o sql/anastasiia-database.json
+```
+
+? testing password
+
 
 ## API Documentation
 - Production (Render): [Swagger Docs](https://lost-and-found-backend-gbc.onrender.com/api/docs/)
