@@ -34,6 +34,16 @@ DATABASES = {"default": env.db("DATABASE_URL")}
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:5173")
 
+USE_SUPABASE_STORAGE = IS_PRODUCTION
+SUPABASE_STORAGE_QUOTA_BYTES = 1 * 1024 * 1024 * 1024  # free accounts get 1GB of storage space.
+SUPABASE_STORAGE_WARN_THRESHOLD = 0.8
+SUPABASE_STORAGE_BLOCK_THRESHOLD = 0.9
+
+if USE_SUPABASE_STORAGE:
+    SUPABASE_URL = env("SUPABASE_URL")
+    SUPABASE_SERVICE_KEY = env("SUPABASE_SERVICE_KEY")
+    SUPABASE_BUCKET = env("SUPABASE_BUCKET", default="items")
+
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -196,3 +206,11 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=0, minute=0),
     },
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
+SUPABASE_STORAGE_CACHE_TTL = 300 
