@@ -147,7 +147,8 @@ if getattr(settings, "USE_SUPABASE_STORAGE", False):
  
     def upload_to_storage(item_id, file):
         ext = os.path.splitext(getattr(file, "name", ""))[1].lower()
-        object_path = f"{item_id}/{uuid.uuid4().hex}{ext}"
+        # object_path = f"{item_id}/{uuid.uuid4().hex}{ext}"
+        object_path = f"items/{item_id}/{uuid.uuid4().hex}{ext}"
         content_type = CONTENT_TYPE_MAP.get(ext, "application/octet-stream")
  
         # Quota check before uploading
