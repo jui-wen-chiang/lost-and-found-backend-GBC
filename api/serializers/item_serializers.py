@@ -24,13 +24,10 @@ class ItemSerializer(serializers.ModelSerializer):
             "id", "title", "description", "item_type", "status",
             "lost_at", "found_at", "category", "location",
             "owner", "created_at", "updated_at",
-            "images", "upload_images", "url"
+            "images", "upload_images"
         ]
         read_only_fields = ["id", "owner", "created_at", "updated_at"]
-
-    def get_url(self, obj):
-        return image_service.get_image_url(obj.file_path)
-    
+        
     def validate_upload_images(self, value):
         if value:
             image_service.validate_image_count(value)

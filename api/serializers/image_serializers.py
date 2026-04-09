@@ -12,4 +12,9 @@ class ImageSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "file_path", "uploaded_at"]
 
     def get_url(self, obj):
-        return image_service.get_image_url(obj.file_path)
+        url = image_service.get_image_url(obj.file_path)
+        if url.startswith("/"):
+            request = self.context.get("request")
+            if request:
+                return request.build_absolute_uri(url)
+        return url
